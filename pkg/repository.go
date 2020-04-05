@@ -4,6 +4,7 @@ import "fmt"
 
 // Repository it's an abstraction for database which keeps all entities (aggregators) in theirs last state
 type Repository interface {
+	AddOrModifyEntity(entity Entity)
 	GetEntity(id string) (Entity, error)
 	Replay(events []Event) error
 	GetUncommitedChanges() []Event
@@ -15,6 +16,12 @@ type Repository interface {
 type MemoryRepository struct {
 	entities       map[string]Entity
 	eventsToCommit []Event
+}
+
+// AddOrModifyEntity just set new entity to collections of Entities.
+// It will be replace if this id exists
+func (r *MemoryRepository) AddOrModifyEntity(entity Entity) {
+	r.entities[entity.GetId()] = entity
 }
 
 // GetEntity return current entity state provided by id
@@ -44,4 +51,13 @@ func (r *MemoryRepository) Save(events []Event) error {
 	r.eventsToCommit = make([]Event, 0)
 
 	return nil
+}
+
+// NewMemoryRepository create empty initialized instance
+func NewMemoryRepository() *MemoryRepository {
+	repository := new(MemoryRepository)
+	repository.entities = make(map[string]Entity)
+	repository.eventsToCommit = make([]Event, 0)
+
+	return repository
 }
