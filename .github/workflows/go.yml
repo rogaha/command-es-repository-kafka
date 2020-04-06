@@ -29,13 +29,11 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
-        sudo apt update
-        sudo apt install pkgconf
-        export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/pkgconfig/
         wget -qO - https://packages.confluent.io/deb/5.4/archive.key | sudo apt-key add -
         sudo add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.4 stable main" -y
         sudo apt-get update -q
         sudo apt-get install confluent-librdkafka-plugins -y
+        sudo apt -y pkg-config
 
     - name: Build
       run: |
