@@ -31,7 +31,7 @@ func fill(server string, topic string, group string) {
 		event := new(pkg.GenericEvent)
 		event.AggregatorId = fmt.Sprintf("%d", i)
 		event.Type = "GenericEvent"
-		event.Payload = `{"type": "GenericEvent", "createTime":"2009-11-10T23:00:00Z", "version":1}`
+		event.Payload = fmt.Sprintf(`{"type": "GenericEvent", "createTime":"2009-11-10T23:00:00Z", "version":1, "id": "%d"}`, i)
 		events = append(events, event)
 
 		i++

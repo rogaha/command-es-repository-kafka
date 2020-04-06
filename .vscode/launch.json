@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/examples",
-            "args": ["-action", "fetch", "-topic", "test", "-group", "test-group", "-server", "192.168.1.151:9092"]
+            "args": ["-action", "fetch", "-topic", "test2", "-group", "test-group", "-server", "192.168.1.151:9092"]
         },
     ]
 }
