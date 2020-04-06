@@ -43,6 +43,7 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 	// TODO: to handle fetching events from all partitions
 	go func() {
 		defer c.Close()
+		defer close(eventsChan)
 
 		run := true
 		currentMessageNo := 0
