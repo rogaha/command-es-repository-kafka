@@ -57,7 +57,11 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 				fmt.Printf("%% Message on %s:\n%s\n",
 					e.TopicPartition, string(e.Value))
 
-				// TODO: declare event
+				event := new(GenericEvent)
+				event.AggregatorId = string(e.Key)
+				event.Payload = string(e.Value)
+
+				events = append(events, event)
 
 				if currentMessageNo >= batch {
 					eventsChan <- events
