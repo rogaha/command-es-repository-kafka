@@ -33,7 +33,6 @@ jobs:
         sudo add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.4 stable main" -y
         sudo apt-get update -q
         sudo apt-get install confluent-librdkafka-plugins -y
-        sudo apt -y pkg-config
 
     - name: Build
       run: |
