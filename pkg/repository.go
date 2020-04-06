@@ -4,6 +4,7 @@ import "fmt"
 
 // Repository it's an abstraction for database which keeps all entities (aggregators) in theirs last state
 type Repository interface {
+	SetProvider(provider Provider) // ??
 	AddOrModifyEntity(entity Entity)
 	GetEntity(id string) (Entity, error)
 	Replay(events []Event) error
