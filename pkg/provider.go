@@ -32,7 +32,6 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 		"auto.offset.reset":    "earliest",
 		"enable.partition.eof": true,
 	})
-	defer c.Close()
 
 	if err != nil {
 		return nil, err
@@ -43,6 +42,8 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 
 	// TODO: to handle fetching events from all partitions
 	go func() {
+		defer c.Close()
+
 		run := true
 		currentMessageNo := 0
 		events := make([]Event, 0)
@@ -56,20 +57,21 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 				fmt.Fprintf(os.Stderr, "%% %v\n", e)
 				// c.Unassign()
 			case *kafka.Message:
-				fmt.Printf("%% Message on %s:\n%s\n",
-					e.TopicPartition, string(e.Value))
+				// fmt.Printf("%% Message on %s:\n%s\n",
+				// 	e.TopicPartition, string(e.Value))
 
 				event := new(GenericEvent)
 				event.AggregatorId = string(e.Key)
 				event.Payload = string(e.Value)
 
 				events = append(events, event)
+				currentMessageNo++
 
 				if currentMessageNo >= batch {
 					eventsChan <- events
 					events = make([]Event, 0)
+					currentMessageNo = 0
 				}
-				currentMessageNo++
 
 			case kafka.PartitionEOF:
 				fmt.Printf("%% Reached %v\n", e)
