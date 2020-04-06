@@ -83,7 +83,7 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 }
 
 func (p *KafkaProvider) SendEvents(events []Event) error {
-
+	return nil
 }
 
 // NewKafkaProvider create new instance of provider
