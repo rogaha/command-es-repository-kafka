@@ -29,6 +29,8 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
+        apk update
+        apk add librdkafka-dev pkgconf
 
     - name: Build
       run: |
