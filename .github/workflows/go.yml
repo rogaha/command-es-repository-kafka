@@ -31,7 +31,7 @@ jobs:
         fi
         sudo apt update
         sudo apt install pkgconf
-        wget -qO - https://packages.confluent.io/deb/5.4/archive.key | sudo apt-key add - ; fi
+        wget -qO - https://packages.confluent.io/deb/5.4/archive.key | sudo apt-key add -
         sudo add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.4 stable main" -y
         sudo apt-get update -q
         sudo apt-get install confluent-librdkafka-plugins -y
