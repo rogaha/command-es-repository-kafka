@@ -4,7 +4,7 @@ import "fmt"
 
 // Repository it's an abstraction for database which keeps all entities (aggregators) in theirs last state
 type Repository interface {
-	SetProvider(provider Provider) // ??
+	InitProvider(provider Provider) error // ??
 	AddOrModifyEntity(entity Entity)
 	GetEntity(id string) (Entity, error)
 	Replay(events []Event) error
@@ -17,6 +17,22 @@ type Repository interface {
 type MemoryRepository struct {
 	entities       map[string]Entity
 	eventsToCommit []Event
+	provider       Provider
+}
+
+// InitProvider set event store provider to repository and start restore entities
+func (r *MemoryRepository) InitProvider(provider Provider) error {
+	r.provider = provider
+	eventsBatch, err := provider.FetchAllEvents(20)
+	if err != nil {
+		return err
+	}
+
+	for events := range eventsBatch {
+		r.Replay(events)
+	}
+
+	return nil
 }
 
 // AddOrModifyEntity just set new entity to collections of Entities.
@@ -48,7 +64,9 @@ func (r *MemoryRepository) GetUncommitedChanges() []Event {
 
 // Save events - so to be honest, just send events to bus provider
 func (r *MemoryRepository) Save(events []Event) error {
-	// TODO: provider here
+	if err := r.provider.SendEvents(events); err != nil {
+		return err
+	}
 	r.eventsToCommit = make([]Event, 0)
 
 	return nil
