@@ -37,7 +37,19 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 		return nil, err
 	}
 
+	metadata, err := c.GetMetadata(&p.topic, false, 2000)
+	if err != nil {
+		return nil, err
+	}
+
+	partitionsMap := make(map[int32]bool)
+
+	for _, partition := range metadata.Topics[p.topic].Partitions {
+		partitionsMap[partition.ID] = false
+	}
+
 	c.SubscribeTopics([]string{p.topic}, nil)
+
 	eventsChan := make(chan []Event)
 
 	// TODO: to handle fetching events from all partitions
@@ -51,16 +63,7 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 		for run == true {
 			ev := c.Poll(0)
 			switch e := ev.(type) {
-			case kafka.AssignedPartitions:
-				fmt.Fprintf(os.Stderr, "%% %v\n", e)
-				// c.Assign(e.Partitions)
-			case kafka.RevokedPartitions:
-				fmt.Fprintf(os.Stderr, "%% %v\n", e)
-				// c.Unassign()
 			case *kafka.Message:
-				// fmt.Printf("%% Message on %s:\n%s\n",
-				// 	e.TopicPartition, string(e.Value))
-
 				event := new(GenericEvent)
 				event.AggregatorId = string(e.Key)
 				event.Payload = string(e.Value)
@@ -76,7 +79,13 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 
 			case kafka.PartitionEOF:
 				fmt.Printf("%% Reached %v\n", e)
-				run = false
+				partitionsMap[e.Partition] = true
+				for _, e := range partitionsMap {
+					run = !e
+					if !e {
+						break
+					}
+				}
 			case kafka.Error:
 				fmt.Fprintf(os.Stderr, "%% Error: %v\n", e)
 				run = false
