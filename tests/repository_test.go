@@ -89,3 +89,58 @@ func Test_Replay_Function_In_MockRepository(t *testing.T) {
 		t.Fatalf("Wrong Entity body - %s", entity.(*MockEntity).Message)
 	}
 }
+
+func Test_InitProvider_And_Check_Generated_Entity(t *testing.T) {
+	event := &EntityCreatedEvent{
+		AggregatorId: "1",
+		Version:      1,
+		Payload:      `{"message":"Just test", "createTime":"2009-11-10T23:00:00Z"}`,
+	}
+	provider := new(MockProvider)
+	provider.SetInitEvents([]pkg.Event{event})
+
+	repository := new(MockRepository)
+	repository.MemoryRepository = pkg.NewMemoryRepository()
+
+	if err := repository.InitProvider(provider, repository); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	entity, err := repository.GetEntity("1")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if entity == nil {
+		t.Fatal("Cannot find Entity")
+	}
+
+	if entity.(*MockEntity).Message != "Just test" {
+		t.Fatalf("Entity has incorrect message - %s", entity.(*MockEntity).Message)
+	}
+}
+
+func Test_Save_Events(t *testing.T) {
+	event := &EntityCreatedEvent{
+		AggregatorId: "1",
+		Version:      1,
+		Payload:      `{"message":"Just test", "createTime":"2009-11-10T23:00:00Z"}`,
+	}
+
+	provider := new(MockProvider)
+
+	repository := new(MockRepository)
+	repository.MemoryRepository = pkg.NewMemoryRepository()
+
+	if err := repository.InitProvider(provider, repository); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if err := repository.Save([]pkg.Event{event}); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if len(provider.Events) == 0 {
+		t.Fatal("Provider events shouldn't be empty")
+	}
+}

@@ -4,7 +4,7 @@ import "fmt"
 
 // Repository it's an abstraction for database which keeps all entities (aggregators) in theirs last state
 type Repository interface {
-	InitProvider(provider Provider) error // ??
+	InitProvider(provider Provider, child Repository) error // ??
 	AddOrModifyEntity(entity Entity)
 	GetEntity(id string) (Entity, error)
 	Replay(events []Event) error
@@ -21,7 +21,7 @@ type MemoryRepository struct {
 }
 
 // InitProvider set event store provider to repository and start restore entities
-func (r *MemoryRepository) InitProvider(provider Provider) error {
+func (r *MemoryRepository) InitProvider(provider Provider, child Repository) error {
 	r.provider = provider
 	eventsBatch, err := provider.FetchAllEvents(20)
 	if err != nil {
@@ -29,7 +29,7 @@ func (r *MemoryRepository) InitProvider(provider Provider) error {
 	}
 
 	for events := range eventsBatch {
-		r.Replay(events)
+		child.Replay(events)
 	}
 
 	return nil

@@ -63,12 +63,36 @@ func (e *MockEntity) GetId() string {
 	return e.Id
 }
 
+type MockProvider struct {
+	Events     []pkg.Event
+	initEvents []pkg.Event
+}
+
+func (p *MockProvider) SetInitEvents(events []pkg.Event) {
+	p.initEvents = events
+}
+
+func (p *MockProvider) FetchAllEvents(batch int) (<-chan []pkg.Event, error) {
+	c := make(chan []pkg.Event)
+	go func() {
+		c <- p.initEvents
+		close(c)
+	}()
+	return c, nil
+}
+
+func (p *MockProvider) SendEvents(events []pkg.Event) error {
+	p.Events = events
+	return nil
+}
+
 type MockRepository struct {
 	*pkg.MemoryRepository
 }
 
 func (r *MockRepository) Replay(events []pkg.Event) error {
 	for _, e := range events {
+		e.LoadPayload()
 		switch e.GetType() {
 		case "EntityCreatedEvent":
 			entity := new(MockEntity)
