@@ -12,6 +12,7 @@ type Event interface {
 	GetAggregatorId() string
 	GetCreateTime() time.Time
 	GetVersion() int32
+	GetPayload() string
 
 	LoadPayload() error
 	SavePayload() error
@@ -39,6 +40,9 @@ func (e *GenericEvent) GetCreateTime() time.Time {
 }
 func (e *GenericEvent) GetVersion() int32 {
 	return e.Version
+}
+func (e *GenericEvent) GetPayload() string {
+	return e.Payload
 }
 
 func (e *GenericEvent) LoadPayload() error {

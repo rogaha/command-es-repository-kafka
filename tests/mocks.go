@@ -29,6 +29,9 @@ func (e *EntityCreatedEvent) GetCreateTime() time.Time {
 func (e *EntityCreatedEvent) GetVersion() int32 {
 	return e.Version
 }
+func (e *EntityCreatedEvent) GetPayload() string {
+	return e.Payload
+}
 func (e *EntityCreatedEvent) LoadPayload() error {
 	var jsonMap map[string]interface{}
 	bytesData := []byte(e.Payload)

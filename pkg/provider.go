@@ -22,6 +22,7 @@ type KafkaProvider struct {
 	groupName string
 }
 
+// FetchAllEvents get all events from all partitions from specified topic
 func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 	rand.Seed(time.Now().UTC().UnixNano())
 
@@ -40,6 +41,7 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 	c.SubscribeTopics([]string{p.topic}, nil)
 	eventsChan := make(chan []Event)
 
+	// TODO: to handle fetching events from all partitions
 	go func() {
 		run := true
 		currentMessageNo := 0
@@ -86,7 +88,27 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 	return eventsChan, nil
 }
 
+// SendEvents put messages on kafka topic
 func (p *KafkaProvider) SendEvents(events []Event) error {
+	pr, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": p.servers})
+
+	if err != nil {
+		return err
+	}
+
+	defer pr.Close()
+	for _, e := range events {
+		message := kafka.Message{
+			Key:            []byte(e.GetAggregatorId()),
+			TopicPartition: kafka.TopicPartition{Topic: &p.topic, Partition: kafka.PartitionAny},
+			Value:          []byte(e.GetPayload()),
+		}
+
+		if err := pr.Produce(&message, nil); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
