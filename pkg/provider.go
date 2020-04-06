@@ -9,7 +9,7 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-// TODO: create kafka implementation for this
+// Provider interface
 type Provider interface {
 	FetchAllEvents(batch int) (<-chan []Event, error)
 	SendEvents(events []Event) error
