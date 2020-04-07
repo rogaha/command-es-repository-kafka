@@ -42,11 +42,7 @@ jobs:
         export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/pkgconfig/
 
     - name: Build
-      run: |
-        cd pkg
-        go build .
+      run: go build ./...
         
     - name: Test
-      run: |
-        cd tests
-        go test
+      run: go test ./...
