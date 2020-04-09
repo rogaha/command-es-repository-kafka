@@ -52,6 +52,9 @@ func (r *UsersRepository) Create(firstName string, lastName string) (pkg.Event, 
 		CreateTime:   time.Now().Format(time.RFC3339),
 		Version:      0,
 	}
+	if err := event.SavePayload(); err != nil {
+		return nil, err
+	}
 
 	return event, nil
 }
@@ -69,6 +72,9 @@ func (r *UsersRepository) Update(id string, firstName string, lastName string) (
 		LastName:     IfThenElse(userEntity.LastName != lastName, lastName, userEntity.LastName).(string),
 		CreateTime:   time.Now().Format(time.RFC3339),
 		Version:      0,
+	}
+	if err := event.SavePayload(); err != nil {
+		return nil, err
 	}
 
 	return event, nil
