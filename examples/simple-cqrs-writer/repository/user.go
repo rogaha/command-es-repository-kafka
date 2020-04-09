@@ -1,4 +1,4 @@
-package main
+package examplerepository
 
 type UserEntity struct {
 	ID        string

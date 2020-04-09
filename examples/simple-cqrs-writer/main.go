@@ -6,14 +6,16 @@ import (
 	"log"
 	"net/http"
 
+	examplecommandhandlers "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/command_handlers"
 	examplecommands "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/commands"
+	examplerepository "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/repository"
 )
 
-type CommandsHandler struct {
-	repository *UsersRepository
+type MainContainer struct {
+	repository *examplerepository.UsersRepository
 }
 
-func (h *CommandsHandler) handler(res http.ResponseWriter, req *http.Request) {
+func (h *MainContainer) handler(res http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
 		body, err := ioutil.ReadAll(req.Body)
 		if err != nil {
@@ -37,7 +39,11 @@ func (h *CommandsHandler) handler(res http.ResponseWriter, req *http.Request) {
 				log.Panic(err)
 				res.WriteHeader(400)
 			}
-			// TODO: command handler action
+
+			if err := examplecommandhandlers.CreateUserCommandHandler(h.repository, command); err != nil {
+				log.Panic(err)
+				res.WriteHeader(400)
+			}
 
 		case "UpdateUserCommand":
 			var command *examplecommands.UpdateUserCommand
@@ -46,14 +52,17 @@ func (h *CommandsHandler) handler(res http.ResponseWriter, req *http.Request) {
 				res.WriteHeader(400)
 			}
 
-			// TODO: command handler action
+			if err := examplecommandhandlers.UpdateUserCommandHandler(h.repository, command); err != nil {
+				log.Panic(err)
+				res.WriteHeader(400)
+			}
 		}
 	}
 }
 
 func main() {
-	h := &CommandsHandler{
-		repository: new(UsersRepository),
+	h := &MainContainer{
+		repository: new(examplerepository.UsersRepository),
 	}
 
 	http.HandleFunc("/", h.handler)
