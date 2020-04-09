@@ -5,15 +5,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	cerk "github.com/hetacode/command-es-repository-kafka"
 	exampleevents "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/events"
-	"github.com/hetacode/command-es-repository-kafka/pkg"
 )
 
 type UsersRepository struct {
-	*pkg.MemoryRepository
+	*cerk.MemoryRepository
 }
 
-func (r *UsersRepository) Replay(events []pkg.Event) error {
+func (r *UsersRepository) Replay(events []cerk.Event) error {
 	for _, e := range events {
 		e.LoadPayload()
 		switch e.GetType() {
@@ -44,7 +44,7 @@ func (r *UsersRepository) Replay(events []pkg.Event) error {
 	return nil
 }
 
-func (r *UsersRepository) Create(firstName string, lastName string) (pkg.Event, error) {
+func (r *UsersRepository) Create(firstName string, lastName string) (cerk.Event, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (r *UsersRepository) Create(firstName string, lastName string) (pkg.Event, 
 	return event, nil
 }
 
-func (r *UsersRepository) Update(id string, firstName string, lastName string) (pkg.Event, error) {
+func (r *UsersRepository) Update(id string, firstName string, lastName string) (cerk.Event, error) {
 	entity, err := r.GetEntity(id)
 	if err != nil {
 		return nil, err

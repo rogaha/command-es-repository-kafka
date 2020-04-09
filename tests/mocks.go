@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/hetacode/command-es-repository-kafka/pkg"
+	cerk "github.com/hetacode/command-es-repository-kafka"
 )
 
 type EntityCreatedEvent struct {
@@ -56,7 +56,7 @@ func (e *EntityCreatedEvent) SavePayload() error {
 	return nil
 }
 
-func (e *EntityCreatedEvent) InitBy(event pkg.Event) {
+func (e *EntityCreatedEvent) InitBy(event cerk.Event) {
 	e.Payload = event.GetPayload()
 	e.AggregatorId = event.GetAggregatorId()
 	e.Version = event.GetVersion()
@@ -73,16 +73,16 @@ func (e *MockEntity) GetId() string {
 }
 
 type MockProvider struct {
-	Events     []pkg.Event
-	initEvents []pkg.Event
+	Events     []cerk.Event
+	initEvents []cerk.Event
 }
 
-func (p *MockProvider) SetInitEvents(events []pkg.Event) {
+func (p *MockProvider) SetInitEvents(events []cerk.Event) {
 	p.initEvents = events
 }
 
-func (p *MockProvider) FetchAllEvents(batch int) (<-chan []pkg.Event, error) {
-	c := make(chan []pkg.Event)
+func (p *MockProvider) FetchAllEvents(batch int) (<-chan []cerk.Event, error) {
+	c := make(chan []cerk.Event)
 	go func() {
 		c <- p.initEvents
 		close(c)
@@ -90,16 +90,16 @@ func (p *MockProvider) FetchAllEvents(batch int) (<-chan []pkg.Event, error) {
 	return c, nil
 }
 
-func (p *MockProvider) SendEvents(events []pkg.Event) error {
+func (p *MockProvider) SendEvents(events []cerk.Event) error {
 	p.Events = events
 	return nil
 }
 
 type MockRepository struct {
-	*pkg.MemoryRepository
+	*cerk.MemoryRepository
 }
 
-func (r *MockRepository) Replay(events []pkg.Event) error {
+func (r *MockRepository) Replay(events []cerk.Event) error {
 	for _, e := range events {
 		e.LoadPayload()
 		switch e.GetType() {

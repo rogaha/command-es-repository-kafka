@@ -32,9 +32,9 @@ type Repository interface {
 * **InitProvider** - should be call on startup of the service. Here work the whole magic with restore repository. All events from kafka topic (from all partitions) are restore and aggregate here.
     > Important! One argument of function is `child Repository`. Here should be pass current inherited instance of repository (not base MemoryRepository)
     ```go
-    provider := pkg.NewKafkaProvider("example-topic", "example-app-group", "192.168.1.151:9092")
+    provider := cerk.NewKafkaProvider("example-topic", "example-app-group", "192.168.1.151:9092")
 	repository := new(examplerepository.UsersRepository)
-	repository.MemoryRepository = pkg.NewMemoryRepository()
+	repository.MemoryRepository = cerk.NewMemoryRepository()
 	if err := repository.InitProvider(provider, repository); err != nil {
 		panic(err)
 	}
@@ -86,7 +86,7 @@ Abstraction for an event which keep of changed entity state.
 
 Library provide **GenericEvent** which is use to restore events from topic. Next these events are mapped to true events by `InitBy` function:
 ```go
-func (r *UsersRepository) Replay(events []pkg.Event) error {
+func (r *UsersRepository) Replay(events []cerk.Event) error {
 	for _, e := range events {
 		e.LoadPayload() // GenericEvent
 		switch e.GetType() {
@@ -138,7 +138,7 @@ And then processes them - creates entity or update entity, create events and sen
 
 Before start you should set proper kafka server to provider in `main.go`:
 ```go
-    provider := pkg.NewKafkaProvider("example-topic", "example-app-group", "<server>)
+    provider := cerk.NewKafkaProvider("example-topic", "example-app-group", "<server>)
 ```
 
 Start:  

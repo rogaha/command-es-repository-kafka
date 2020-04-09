@@ -1,4 +1,4 @@
-package pkg
+package cerk
 
 import (
 	"encoding/json"

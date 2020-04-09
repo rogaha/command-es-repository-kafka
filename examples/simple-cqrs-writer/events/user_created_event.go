@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/hetacode/command-es-repository-kafka/pkg"
+	cerk "github.com/hetacode/command-es-repository-kafka"
 )
 
 type UserCreatedEvent struct {
@@ -73,7 +73,7 @@ func (e *UserCreatedEvent) SavePayload() error {
 	return nil
 }
 
-func (e *UserCreatedEvent) InitBy(event pkg.Event) {
+func (e *UserCreatedEvent) InitBy(event cerk.Event) {
 	e.Payload = event.GetPayload()
 	e.AggregatorId = event.GetAggregatorId()
 	e.Version = event.GetVersion()
