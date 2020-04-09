@@ -144,3 +144,27 @@ func Test_Save_Events(t *testing.T) {
 		t.Fatal("Provider events shouldn't be empty")
 	}
 }
+
+func Test_Init_Event_By_Other_Event(t *testing.T) {
+	event := &EntityCreatedEvent{
+		AggregatorId: "1",
+		Version:      1,
+		Payload:      `{"message":"Just test", "createTime":"2009-11-10T23:00:00Z"}`,
+	}
+	if err := event.LoadPayload(); err != nil {
+		t.Fatal(err)
+	}
+
+	eventToCompare := new(EntityCreatedEvent)
+	eventToCompare.InitBy(event)
+	if err := eventToCompare.LoadPayload(); err != nil {
+		t.Fatal(err)
+	}
+
+	if event.GetAggregatorId() != eventToCompare.GetAggregatorId() {
+		t.Fatal("Events have different ids")
+	}
+	if event.Message != eventToCompare.Message {
+		t.Fatal("Events have different messages")
+	}
+}

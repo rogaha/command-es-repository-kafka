@@ -16,6 +16,7 @@ type Event interface {
 
 	LoadPayload() error
 	SavePayload() error
+	InitBy(event Event)
 }
 
 type GenericEvent struct {
@@ -53,12 +54,15 @@ func (e *GenericEvent) LoadPayload() error {
 	}
 
 	e.Type = jsonMap["type"].(string)
-	e.CreateTime = jsonMap["createTime"].(string)
-	e.Version = jsonMap["version"].(int32)
+	e.CreateTime = jsonMap["create_time"].(string)
+	e.Version = int32(jsonMap["version"].(float64))
 
 	return nil
 }
 
 func (e *GenericEvent) SavePayload() error {
 	return fmt.Errorf("For GenericEvent implementation is unnecessary")
+}
+
+func (e *GenericEvent) InitBy(event Event) {
 }

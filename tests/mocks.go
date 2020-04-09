@@ -56,6 +56,12 @@ func (e *EntityCreatedEvent) SavePayload() error {
 	return nil
 }
 
+func (e *EntityCreatedEvent) InitBy(event pkg.Event) {
+	e.Payload = event.GetPayload()
+	e.AggregatorId = event.GetAggregatorId()
+	e.Version = event.GetVersion()
+}
+
 type MockEntity struct {
 	Id string
 
