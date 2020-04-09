@@ -4,11 +4,11 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/hetacode/command-es-repository-kafka/pkg"
+	cerk "github.com/hetacode/command-es-repository-kafka"
 )
 
 func fetch(server string, topic string, group string) {
-	provider := pkg.NewKafkaProvider(topic, group, server)
+	provider := cerk.NewKafkaProvider(topic, group, server)
 	eventsBatch, err := provider.FetchAllEvents(10)
 
 	if err != nil {
@@ -23,12 +23,12 @@ func fetch(server string, topic string, group string) {
 }
 
 func fill(server string, topic string, group string) {
-	events := make([]pkg.Event, 0)
-	provider := pkg.NewKafkaProvider(topic, group, server)
+	events := make([]cerk.Event, 0)
+	provider := cerk.NewKafkaProvider(topic, group, server)
 
 	i := 0
 	for i < 100 {
-		event := new(pkg.GenericEvent)
+		event := new(cerk.GenericEvent)
 		event.AggregatorId = fmt.Sprintf("%d", i)
 		event.Type = "GenericEvent"
 		event.Payload = fmt.Sprintf(`{"type": "GenericEvent", "createTime":"2009-11-10T23:00:00Z", "version":1, "id": "%d"}`, i)

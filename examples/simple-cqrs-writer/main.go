@@ -6,10 +6,10 @@ import (
 	"log"
 	"net/http"
 
+	cerk "github.com/hetacode/command-es-repository-kafka"
 	examplecommandhandlers "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/command_handlers"
 	examplecommands "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/commands"
 	examplerepository "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/repository"
-	"github.com/hetacode/command-es-repository-kafka/pkg"
 )
 
 type MainContainer struct {
@@ -63,9 +63,9 @@ func (h *MainContainer) handler(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	provider := pkg.NewKafkaProvider("example-topic", "example-app-group", "192.168.1.151:9092")
+	provider := cerk.NewKafkaProvider("example-topic", "example-app-group", "192.168.1.151:9092")
 	repository := new(examplerepository.UsersRepository)
-	repository.MemoryRepository = pkg.NewMemoryRepository()
+	repository.MemoryRepository = cerk.NewMemoryRepository()
 	if err := repository.InitProvider(provider, repository); err != nil {
 		panic(err)
 	}

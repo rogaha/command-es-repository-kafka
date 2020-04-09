@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hetacode/command-es-repository-kafka/pkg"
+	cerk "github.com/hetacode/command-es-repository-kafka"
 )
 
 func Test_Replay_Method_For_MemoryRepository_Should_Be_Override(t *testing.T) {
-	repository := new(pkg.MemoryRepository)
+	repository := new(cerk.MemoryRepository)
 
-	err := repository.Replay(make([]pkg.Event, 0))
+	err := repository.Replay(make([]cerk.Event, 0))
 	if err == nil {
 		t.Error("Error shouldn't be null")
 	}
@@ -69,9 +69,9 @@ func Test_Replay_Function_In_MockRepository(t *testing.T) {
 	}
 
 	repository := new(MockRepository)
-	repository.MemoryRepository = pkg.NewMemoryRepository()
+	repository.MemoryRepository = cerk.NewMemoryRepository()
 
-	events := []pkg.Event{event}
+	events := []cerk.Event{event}
 	if err := repository.Replay(events); err != nil {
 		t.Fatal(err.Error())
 	}
@@ -97,10 +97,10 @@ func Test_InitProvider_And_Check_Generated_Entity(t *testing.T) {
 		Payload:      `{"message":"Just test", "createTime":"2009-11-10T23:00:00Z"}`,
 	}
 	provider := new(MockProvider)
-	provider.SetInitEvents([]pkg.Event{event})
+	provider.SetInitEvents([]cerk.Event{event})
 
 	repository := new(MockRepository)
-	repository.MemoryRepository = pkg.NewMemoryRepository()
+	repository.MemoryRepository = cerk.NewMemoryRepository()
 
 	if err := repository.InitProvider(provider, repository); err != nil {
 		t.Fatal(err.Error())
@@ -130,13 +130,13 @@ func Test_Save_Events(t *testing.T) {
 	provider := new(MockProvider)
 
 	repository := new(MockRepository)
-	repository.MemoryRepository = pkg.NewMemoryRepository()
+	repository.MemoryRepository = cerk.NewMemoryRepository()
 
 	if err := repository.InitProvider(provider, repository); err != nil {
 		t.Fatal(err.Error())
 	}
 
-	if err := repository.Save([]pkg.Event{event}); err != nil {
+	if err := repository.Save([]cerk.Event{event}); err != nil {
 		t.Fatal(err.Error())
 	}
 

@@ -1,9 +1,9 @@
 package examplecommandhandlers
 
 import (
+	cerk "github.com/hetacode/command-es-repository-kafka"
 	examplecommands "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/commands"
 	examplerepository "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/repository"
-	"github.com/hetacode/command-es-repository-kafka/pkg"
 )
 
 func CreateUserCommandHandler(repository *examplerepository.UsersRepository, command *examplecommands.CreateUserCommand) error {
@@ -11,10 +11,10 @@ func CreateUserCommandHandler(repository *examplerepository.UsersRepository, com
 	if err != nil {
 		return err
 	}
-	if err := repository.Replay([]pkg.Event{event}); err != nil {
+	if err := repository.Replay([]cerk.Event{event}); err != nil {
 		return err
 	}
-	if err := repository.Save([]pkg.Event{event}); err != nil {
+	if err := repository.Save([]cerk.Event{event}); err != nil {
 		return err
 	}
 
