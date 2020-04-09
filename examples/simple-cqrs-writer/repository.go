@@ -1,6 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/google/uuid"
 	exampleevents "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/events"
 	"github.com/hetacode/command-es-repository-kafka/pkg"
 )
@@ -34,4 +38,46 @@ func (r *UsersRepository) Replay(events []pkg.Event) error {
 	}
 
 	return nil
+}
+
+func (r *UsersRepository) Create(firstName string, lastName string) (pkg.Event, error) {
+	id, err := uuid.NewUUID()
+	if err != nil {
+		return nil, err
+	}
+	event := &exampleevents.UserCreatedEvent{
+		AggregatorId: fmt.Sprintf("%s", id),
+		FirstName:    firstName,
+		LastName:     lastName,
+		CreateTime:   time.Now().Format(time.RFC3339),
+		Version:      0,
+	}
+
+	return event, nil
+}
+
+func (r *UsersRepository) Update(id string, firstName string, lastName string) (pkg.Event, error) {
+	entity, err := r.GetEntity(id)
+	if err != nil {
+		return nil, err
+	}
+	userEntity := entity.(*UserEntity)
+
+	event := &exampleevents.UserModifiedEvent{
+		AggregatorId: fmt.Sprintf("%s", id),
+		FirstName:    IfThenElse(userEntity.FirstName != firstName, firstName, userEntity.FirstName).(string),
+		LastName:     IfThenElse(userEntity.LastName != lastName, lastName, userEntity.LastName).(string),
+		CreateTime:   time.Now().Format(time.RFC3339),
+		Version:      0,
+	}
+
+	return event, nil
+}
+
+func IfThenElse(condition bool, a interface{}, b interface{}) interface{} {
+	if condition {
+		return a
+	}
+
+	return b
 }
