@@ -53,8 +53,8 @@ func (e *GenericEvent) LoadPayload() error {
 	}
 
 	e.Type = jsonMap["type"].(string)
-	e.CreateTime = jsonMap["createTime"].(string)
-	e.Version = jsonMap["version"].(int32)
+	e.CreateTime = jsonMap["create_time"].(string)
+	e.Version = int32(jsonMap["version"].(float64))
 
 	return nil
 }

@@ -9,6 +9,7 @@ import (
 	examplecommandhandlers "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/command_handlers"
 	examplecommands "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/commands"
 	examplerepository "github.com/hetacode/command-es-repository-kafka/examples/simple-cqrs-writer/repository"
+	"github.com/hetacode/command-es-repository-kafka/pkg"
 )
 
 type MainContainer struct {
@@ -22,6 +23,7 @@ func (h *MainContainer) handler(res http.ResponseWriter, req *http.Request) {
 			log.Panic(err)
 			res.WriteHeader(400)
 		}
+		log.Printf("Received commmand: %s", string(body))
 
 		var jsonMap map[string]interface{}
 		jsonData := body
@@ -61,9 +63,17 @@ func (h *MainContainer) handler(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	provider := pkg.NewKafkaProvider("example-topic", "example-app-group", "192.168.1.151:9092")
+	repository := new(examplerepository.UsersRepository)
+	repository.MemoryRepository = pkg.NewMemoryRepository()
+	if err := repository.InitProvider(provider, repository); err != nil {
+		panic(err)
+	}
+
 	h := &MainContainer{
-		repository: new(examplerepository.UsersRepository),
+		repository: repository,
 	}
 
 	http.HandleFunc("/", h.handler)
+	http.ListenAndServe(":4000", nil)
 }

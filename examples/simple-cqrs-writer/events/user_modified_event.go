@@ -44,7 +44,7 @@ func (e *UserModifiedEvent) LoadPayload() error {
 
 	e.Type = jsonMap["type"].(string)
 	e.CreateTime = jsonMap["create_time"].(string)
-	e.Version = jsonMap["version"].(int32)
+	e.Version = int32(jsonMap["version"].(float64))
 	e.FirstName = jsonMap["first_name"].(string)
 	e.LastName = jsonMap["last_name"].(string)
 
