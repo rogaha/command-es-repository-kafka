@@ -18,10 +18,8 @@ func (r *UsersRepository) Replay(events []pkg.Event) error {
 		e.LoadPayload()
 		switch e.GetType() {
 		case "UserCreatedEvent":
-			event := &exampleevents.UserCreatedEvent{
-				AggregatorId: e.GetAggregatorId(),
-				Payload:      e.GetPayload(),
-			}
+			event := new(exampleevents.UserCreatedEvent)
+			event.InitBy(e)
 			event.LoadPayload()
 			entity := new(UserEntity)
 			entity.ID = e.GetAggregatorId()
@@ -29,10 +27,8 @@ func (r *UsersRepository) Replay(events []pkg.Event) error {
 			entity.LastName = event.LastName
 			r.AddOrModifyEntity(entity)
 		case "UserModifiedEvent":
-			event := &exampleevents.UserModifiedEvent{
-				AggregatorId: e.GetAggregatorId(),
-				Payload:      e.GetPayload(),
-			}
+			event := new(exampleevents.UserModifiedEvent)
+			event.InitBy(e)
 			event.LoadPayload()
 			entity, err := r.GetEntity(event.GetAggregatorId())
 			if err != nil {

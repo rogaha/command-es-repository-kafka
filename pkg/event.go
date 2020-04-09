@@ -16,6 +16,7 @@ type Event interface {
 
 	LoadPayload() error
 	SavePayload() error
+	InitBy(event Event)
 }
 
 type GenericEvent struct {
@@ -61,4 +62,7 @@ func (e *GenericEvent) LoadPayload() error {
 
 func (e *GenericEvent) SavePayload() error {
 	return fmt.Errorf("For GenericEvent implementation is unnecessary")
+}
+
+func (e *GenericEvent) InitBy(event Event) {
 }

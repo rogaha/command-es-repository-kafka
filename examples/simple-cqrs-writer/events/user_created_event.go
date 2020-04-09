@@ -3,6 +3,8 @@ package exampleevents
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/hetacode/command-es-repository-kafka/pkg"
 )
 
 type UserCreatedEvent struct {
@@ -69,4 +71,10 @@ func (e *UserCreatedEvent) SavePayload() error {
 	e.Payload = string(bytesData)
 
 	return nil
+}
+
+func (e *UserCreatedEvent) InitBy(event pkg.Event) {
+	e.Payload = event.GetPayload()
+	e.AggregatorId = event.GetAggregatorId()
+	e.Version = event.GetVersion()
 }
