@@ -168,3 +168,31 @@ func Test_Init_Event_By_Other_Event(t *testing.T) {
 		t.Fatal("Events have different messages")
 	}
 }
+
+func Test_AddNewEvent_In_Repository_And_Result_GetUncommitedChanges(t *testing.T) {
+	provider := new(MockProvider)
+
+	repository := new(MockRepository)
+	repository.MemoryRepository = cerk.NewMemoryRepository()
+	if err := repository.InitProvider(provider, repository); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	repository.CreateFakeEvent()
+	events := repository.GetUncommitedChanges()
+	if events == nil || len(events) != 1 {
+		t.Fatal("Events array should exactly one element")
+	}
+
+	if err := repository.Save(events); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if len(provider.Events) == 0 {
+		t.Fatal("Provider events shouldn't be empty")
+	}
+
+	if len(repository.GetUncommitedChanges()) != 0 {
+		t.Fatal("List of uncommitted events should be empty")
+	}
+}
