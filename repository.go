@@ -8,6 +8,7 @@ type Repository interface {
 	AddOrModifyEntity(entity Entity)
 	GetEntity(id string) (Entity, error)
 	Replay(events []Event) error
+	AddNewEvent(event Event)
 	GetUncommitedChanges() []Event
 	Save(events []Event) error
 }
@@ -55,6 +56,11 @@ func (r *MemoryRepository) GetEntity(id string) (Entity, error) {
 // This method should be override by true implementation with update cases for each event type
 func (r *MemoryRepository) Replay(events []Event) error {
 	return fmt.Errorf("Please implement this method in ith own way")
+}
+
+// AddNewEvent set newly created event to uncommitted list of events
+func (r *MemoryRepository) AddNewEvent(event Event) {
+	r.eventsToCommit = append(r.eventsToCommit, event)
 }
 
 // GetUncommitedChanges get new events which were created by changes methods
