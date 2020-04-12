@@ -113,3 +113,12 @@ func (r *MockRepository) Replay(events []cerk.Event) error {
 
 	return nil
 }
+
+func (r *MockRepository) CreateFakeEvent() {
+	event := &EntityCreatedEvent{
+		AggregatorId: "1",
+		Version:      1,
+		Payload:      `{"message":"fake", "createTime":"2009-11-10T23:00:00Z"}`,
+	}
+	r.AddNewEvent(event)
+}
