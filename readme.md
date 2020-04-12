@@ -24,6 +24,7 @@ type Repository interface {
 	AddOrModifyEntity(entity Entity)
 	GetEntity(id string) (Entity, error)
 	Replay(events []Event) error
+	AddNewEvent(event Event)
 	GetUncommitedChanges() []Event
 	Save(events []Event) error
 }
@@ -42,6 +43,7 @@ type Repository interface {
 * **AddOrModifyEntity** - create new entity (aggregator) or update old by id
 * **GetEntity** - get entity (aggregator) by id
 * **Replay** - restore/update state of entity/entities 
+* **AddNewEvent** - added new event to uncommitted list of events
 * **GetUncommitedChanges** - return the new events after update state of entity
 * **Save** - just send new events to store/bus
 
