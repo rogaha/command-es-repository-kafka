@@ -1,4 +1,6 @@
-# Purpose of the library
+**The library is in a theoretical state. So, it's means that cannot be used in production for now**
+
+# The purpose of the library
 
 This library fill the lack of small part of CQRS pattern in Go using kafka.  
 What it's means? Which part of the CQRS pattern is supported?
@@ -54,12 +56,15 @@ The library has prepared memory implementation of this interface - **MemoryRepos
 type Provider interface {
 	FetchAllEvents(batch int) (<-chan []Event, error)
 	SendEvents(events []Event) error
+	Close()
 }
 ```
 
 It's a simple interface which provide functions for receive all events (in batches) and send events to bus.
 
 The library give you **KafkaProvider** implementation with simple constructor `NewKafkaProvider(topic string, groupName string, servers string)`
+
+Always you can release resources when you don't want an consumer instance. For this, there is **Close()** function where the kafka implementation just call Close function of kafka producer.
 
 ## Event
 ```go
