@@ -13,6 +13,7 @@ import (
 type Provider interface {
 	FetchAllEvents(batch int) (<-chan []Event, error)
 	SendEvents(events []Event) error
+	Close()
 }
 
 // KafkaProvider implemented provider for kafka
@@ -20,6 +21,7 @@ type KafkaProvider struct {
 	topic     string
 	servers   string
 	groupName string
+	consumer  *kafka.Producer
 }
 
 // FetchAllEvents get all events from all partitions from specified topic
@@ -101,13 +103,6 @@ func (p *KafkaProvider) FetchAllEvents(batch int) (<-chan []Event, error) {
 
 // SendEvents put messages on kafka topic
 func (p *KafkaProvider) SendEvents(events []Event) error {
-	pr, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": p.servers})
-
-	if err != nil {
-		return err
-	}
-
-	defer pr.Close()
 	for _, e := range events {
 		message := kafka.Message{
 			Key:            []byte(e.GetAggregatorId()),
@@ -115,12 +110,19 @@ func (p *KafkaProvider) SendEvents(events []Event) error {
 			Value:          []byte(e.GetPayload()),
 		}
 
-		if err := pr.Produce(&message, nil); err != nil {
+		if err := p.consumer.Produce(&message, nil); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+// Close just close producer instance
+func (p *KafkaProvider) Close() {
+	if p.consumer != nil {
+		p.consumer.Close()
+	}
 }
 
 // NewKafkaProvider create new instance of provider
@@ -129,6 +131,14 @@ func NewKafkaProvider(topic string, groupName string, servers string) Provider {
 	provider.servers = servers
 	provider.topic = topic
 	provider.groupName = groupName
+
+	pr, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": provider.servers})
+
+	if err != nil {
+		panic(err)
+	}
+
+	provider.consumer = pr
 
 	return provider
 }

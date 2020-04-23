@@ -64,6 +64,8 @@ func (h *MainContainer) handler(res http.ResponseWriter, req *http.Request) {
 
 func main() {
 	provider := cerk.NewKafkaProvider("example-topic", "example-app-group", "192.168.1.151:9092")
+	defer provider.Close()
+
 	repository := new(examplerepository.UsersRepository)
 	repository.MemoryRepository = cerk.NewMemoryRepository()
 	if err := repository.InitProvider(provider, repository); err != nil {

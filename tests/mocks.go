@@ -95,6 +95,10 @@ func (p *MockProvider) SendEvents(events []cerk.Event) error {
 	return nil
 }
 
+func (p *MockProvider) Close() {
+
+}
+
 type MockRepository struct {
 	*cerk.MemoryRepository
 }
